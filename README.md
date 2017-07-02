@@ -15,6 +15,6 @@
 <br>
 <script>alert("Only for Windows!");alert("仅适配Windows.");</script>
 <br><br>
-© Copyright 2017 Pixel Studio.
+© Copyright Pixel Studio 2017.
 <br>
 <img src="https://avatars0.githubusercontent.com/u/18441260?v=3&s=460"></img>

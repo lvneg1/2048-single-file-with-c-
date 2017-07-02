@@ -14,5 +14,7 @@
 下载地址:https://github.com/ChenyeJin/2048-single-file-with-c-/blob/master/2048.exe?raw=true
 <br>
 <script>alert("Only for Windows!");alert("仅适配Windows.");</script>
+<br><br>
 © Copyright 2017 Pixel Studio.
-![Pixel Studio's Logo](https://avatars0.githubusercontent.com/u/18441260?v=3&s=460)
+<br>
+<img src="https://avatars0.githubusercontent.com/u/18441260?v=3&s=460"></img>

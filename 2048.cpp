@@ -2,23 +2,30 @@
 #include<conio.h>
 #include<windows.h>
 #include<algorithm>
+#include<string>
 #define UP_KEY 72
 #define DOWN_KEY 80
 #define LEFT_KEY 75
 #define RIGHT_KEY 77
+#define VER "V:1.11 With Colors" 
 using namespace std;
 const char message[6][31]={
 " ----------------------------\n",
 "|     The  2048  Game      |\n",
-"|         ·¢ÐÐ°æ 1         |\n",
+"|   Difficultly:Easy/Hard  |\n",
 "----------------------------\n",
 "Loading.....................\n",
 "Ticks:"
 };
 void GameStart();
+void ClearLine();
+void ClearLine(){
+	for(int i=1;i<=100;i++) putchar('\b');
+}
 int main(){
-	system("mode con lines=10 cols=40");
+	system("mode con lines=8 cols=34");
 	system("title The 2048 Game by:Chenye Jin!");
+	printf("This ver is %s!!!\n",VER);
 	for(int i=0;i<6;i++){
 		for(int j=0;j<=strlen(message[i]);j++){
 			putchar(message[i][j]);
@@ -41,10 +48,16 @@ int getval(){
 //	}
 	return (1<<(rand()%3)+1);
 }
+int easylevel;
 void init(){
 	memset(mp,0,sizeof mp);
 	score=0;
-	printf("\tGenerating maps... Please wait\t\n");printf("°´¡ü¡ý¡û¡ú·½Ïò¼üÀ´²Ù¿Ø!\n");Sleep(500);
+	printf("Press e to Easy,h to Hard.\n");
+	char ch=getch();
+	while(ch!='e'&&ch!='E'&&ch!='h'&&ch!='H') ch=getch();
+	if(ch=='e'||ch=='E') easylevel=2;
+	else easylevel=1;
+	printf("Generating maps...\nPlease wait\n");printf("Â°Â´Â¡Ã¼Â¡Ã½Â¡Ã»Â¡ÃºÂ·Â½ÃÃ²Â¼Ã¼Ã€Â´Â²Ã™Â¿Ã˜!\n");Sleep(500);
 	srand(GetTickCount());
 	int cnt=rand()%(7-4+1)+4;
 	while(cnt){
@@ -76,7 +89,8 @@ void newNum(){
 	if(tot==0) return;
 	int cnt=rand()%tot+1;
 	if(tot>4) cnt/=2;
-	while(cnt){
+	if(cnt) cnt-=(rand())%cnt;
+	while(cnt>0){
 		int x=rand()%4,y=rand()%4;
 		while(mp[x][y]) x=rand()%4,y=rand()%4;
 		mp[x][y]=getval();
@@ -143,30 +157,62 @@ int maxnum(){
 		}
 	}
 }
+int filescore=0;
+bool breit=0;
+void showEnd(int score){
+		printf("Your score:%d\nMax:%d\n",score,maxnum());
+		FILE*fp=fopen("score.dat","rb");char bnam[20005];
+		if(fp==NULL) filescore=-1;
+		else fscanf(fp,"%s%d",bnam,&filescore);fclose(fp);
+		if(filescore==-1) printf("!!!There's not any history of score!\n");
+		else printf("The best score is %d by %s\n",filescore,bnam);
+		if(filescore<score){
+			printf("Great!Your are best now!\nYour name:");char s[20005];int tmp=0;
+			{
+				char ch=getchar();
+				while(ch!='\n') s[++tmp]=ch,ch=getchar();
+			}
+			fp=fopen("score.dat","wb");fprintf(fp,"%s\n%d\n",s+1,score);fclose(fp);
+		}
+		printf("Y to continue and N to exit:");
+		char ch=getchar();while(ch!='Y'&&ch!='y'&&ch!='N'&&ch!='n') ch=getchar();
+		if(ch=='\n') ch=getchar();
+		if(ch=='Y'||ch=='y') breit=1;
+		else if(ch=='N'||ch=='n') exit(0);
+		else system("pause"),exit(0);
+		system("cls");
+}
+void rndcolor(){
+//	const char colors[]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+	const char colors[]="0123456789abcdef";
+	string command="color ";int t=rand()%16;
+	command=command+colors[t]+colors[(t+7)%16];
+	system(command.c_str());
+}
 void GameStart(){
 	init();bool nogen=0;
 	while(1){
+		rndcolor();
 		display();
-		if(!nogen) newNum();nogen=0;
 		switch(getch()){
 			case UP_KEY:{
-				works(1);
+				for(int i=1;i<=2;i++) works(1);
 				break;
 			}
 			case DOWN_KEY:{
-				works(2);
+				for(int i=1;i<=2;i++) works(2);
 				break;
 			}
 			case LEFT_KEY:{
-				works(3);
+				for(int i=1;i<=2;i++) works(3);
 				break;
 			}
 			case RIGHT_KEY:{
-				works(4);
+				for(int i=1;i<=2;i++) works(4);
 				break;
 			}
 			default:{
-				printf("°´¡ü¡ý¡û¡ú·½Ïò¼üÀ´²Ù¿Ø!\n");
+				//printf("Â°Â´Â¡Ã¼Â¡Ã½Â¡Ã»Â¡ÃºÂ·Â½ÃÃ²Â¼Ã¼Ã€Â´Â²Ã™Â¿Ã˜!\n");
 				nogen=1;
 				break;
 			} 
@@ -174,23 +220,18 @@ void GameStart(){
 		if(checkWin()){
 			system("cls");
 			for(int i=1;i<=rand()%4;i++) printf("You win!\n");
-			printf("Score:%d\nMax:%d\n",score,maxnum());
-			printf("Y to continue and N to exit:");
-			char ch=getchar();while(ch!='Y'&&ch!='y'&&ch!='N'&&ch!='n') ch=getchar();
-			if(ch=='Y'||ch=='y') break;
-			else if(ch=='N'||ch=='n') exit(0);
-			else system("pause"),exit(0);
+			showEnd(score);
 		}
 		if(checkFail()){
 			system("cls");
 			for(int i=1;i<=rand()%4;i++) printf("You failed!\n");
-			printf("Score:%d\nMax:%d\n",score,maxnum());
-			printf("Y to continue and N to exit:");
-			char ch=getchar();while(ch!='Y'&&ch!='y'&&ch!='N'&&ch!='n') ch=getchar();
-			if(ch=='Y'||ch=='y') break;
-			else if(ch=='N'||ch=='n') exit(0);
-			else system("pause"),exit(0);
+			showEnd(score);
 		}
+		if(breit){
+			breit=0;
+			break;
+		}
+		if(!nogen&&rand()%easylevel==0) newNum();nogen=0;
 		display();
 	}
 }
